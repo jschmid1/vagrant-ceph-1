@@ -672,7 +672,7 @@ SLE12-SP1:
 # This requires 5G RAM and ~32G disk space.  Initial vagrant up is ~28 minutes
 # on a quad core.
 default:
-  description: "admin, 3 monitors, 6 data nodes with journals"
+  description: "admin, 3 monitors, 5 data nodes with journals"
   nodes:
     admin:
       management: 192.168.1.254
@@ -710,12 +710,16 @@ default:
       management: 192.168.1.25
       public:  172.16.1.25
       cluster: 172.16.2.25
-    data6:
-      management: 192.168.1.26
-      public:  172.16.1.26
-      cluster: 172.16.2.26
   memory:
-    admin: 1024
+    admin: 1536
+    mon1: 1536
+    mon2: 1536
+    mon3: 1536
+    data1: 1536
+    data2: 1536
+    data3: 1536
+    data4: 1536 
+    data5: 1536
   disks:
     data1:
       hds: 5
@@ -730,9 +734,6 @@ default:
       hds: 5
       ssds: 1
     data5:
-      hds: 5
-      ssds: 1
-    data6:
       hds: 5
       ssds: 1
 # The small configuration is a typical demo setup of a monitor and three data
