@@ -1,4 +1,4 @@
-osd_init: default-small
+osd_init: default
 #pool_method: custom
 #igw_method: custom
 #igw_import: custom

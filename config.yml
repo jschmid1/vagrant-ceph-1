@@ -408,9 +408,89 @@ openSUSE-42.1:
         - systemctl enable salt-master
 
 ########################################
-# SLE 12 SP2 SES54
+# OpenSUSE Leap 42.2
 ########################################
-SLE12-SP2-SES5:
+opensuse/openSUSE-42.2-x86_64:
+  salt:
+    repos:
+      'ceph': 'http://download.opensuse.org/repositories/filesystems:/ceph/openSUSE_Leap_42.3/'
+      '42.2': 'http://download.opensuse.org/distribution/leap/42.2/repo/oss/suse/'
+    packages:
+      all:
+        - vim
+        - salt-minion
+      admin:
+        - salt-master
+        - ntp
+    files:
+      all: false
+      admin: true
+    commands:
+      admin:
+        - systemctl start ntpd
+        - systemctl enable ntpd
+        - systemctl start salt-master
+        - systemctl enable salt-master
+        - sleep 10
+        - salt-key -y -A  || exit 0
+      all:
+        - systemctl disable SuSEfirewall2
+        - systemctl stop SuSEfirewall2
+        - systemctl restart salt-minion
+        - systemctl enable salt-minion
+          
+########################################
+# SLE 12 SP3 SES5
+########################################
+SLE12-SP3-patch:
+  salt:
+    repos:
+      'Storage': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP3:/Update:/Products:/SES5/images/repo/SUSE-Enterprise-Storage-5-POOL-x86_64-Media1/'
+      'SP3': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP3:/GA/images/repo/SLE-12-SP3-Server-POOL-x86_64-Media1/'
+    packages:
+      all:
+        - vim
+        - salt-minion
+      admin:
+        - salt-master
+        - vim-data
+        - ntp
+      client1:
+        - multipath-tools
+      client2:
+        - multipath-tools
+    files:
+      all: false
+      admin: true
+    commands:
+      admin:
+        - systemctl start ntpd
+        - systemctl enable ntpd
+        - systemctl start salt-master
+        - systemctl enable salt-master
+        - sleep 10
+        - salt-key -y -A  || exit 0
+        - chown -R salt:salt /srv/pillar/ceph /srv/salt/ceph 
+        - chmod 1777 /tmp
+      all:
+        - SUSEConnect -r 0000000000000000
+        - SUSEConnect -r 0000000000000000 -p ses/5/x86_64
+        - systemctl disable SuSEfirewall2
+        - systemctl stop SuSEfirewall2
+        - systemctl restart salt-minion
+        - systemctl enable salt-minion
+        - zypper rr 1 2
+      calmari:
+        - systemctl start salt-master
+        - systemctl enable salt-master
+
+########################################
+# SLE 12 SP2 SES4
+########################################
+########################################
+# SLE 12 SP3 SES5
+########################################
+SLE12-SP3:
   openattic:
     repos:
       'OpenAttic': 'http://download.opensuse.org/repositories/filesystems:/openATTIC/SLE_12_SP2/'
@@ -444,22 +524,16 @@ SLE12-SP2-SES5:
         - oaconfig install --allow-broken-hostname
   salt:
     repos:
-      'sle-sdk': 'http://download.suse.de/ibs/SUSE/Products/SLE-SDK/12-SP2/x86_64/product/'
-      'sle-sdk update': 'http://download.suse.de/ibs/SUSE/Updates/SLE-SDK/12-SP2/x86_64/update/'
-      'SLE 12 update': 'http://download.suse.de/ibs/SUSE/Products/SLE-SERVER/12-SP2/x86_64/product/'
-      'Salt': 'http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/SLE_12_SP2/'
-      'Storage': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/SES5/standard/'
-      'sle12updates': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update/standard/'
+      'Storage': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP3:/Update:/Products:/SES5/images/repo/SUSE-Enterprise-Storage-5-POOL-x86_64-Media1/'
+      'SP3': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP3:/GA/images/repo/SLE-12-SP3-Server-POOL-x86_64-Media1/'
     packages:
       all:
         - vim
-        - vim-data
-        - python-setuptools
         - salt-minion
       admin:
         - salt-master
+        - vim-data
         - ntp
-        - tree
       client1:
         - multipath-tools
       client2:
@@ -478,6 +552,8 @@ SLE12-SP2-SES5:
         - chown -R salt:salt /srv/pillar/ceph /srv/salt/ceph 
         - chmod 1777 /tmp
       all:
+        - systemctl disable SuSEfirewall2
+        - systemctl stop SuSEfirewall2
         - systemctl restart salt-minion
         - systemctl enable salt-minion
       calmari:
@@ -711,10 +787,10 @@ default:
       public:  172.16.1.25
       cluster: 172.16.2.25
   memory:
-    admin: 1536
-    mon1: 1536
-    mon2: 1536
-    mon3: 1536
+    admin: 2048
+    mon1: 2048
+    mon2: 2048
+    mon3: 2048
     data1: 1536
     data2: 1536
     data3: 1536
