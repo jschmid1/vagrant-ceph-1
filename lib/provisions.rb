@@ -15,9 +15,11 @@ module Vagrant
     def initialize(node, repos)
       @node = node
       @cmds = []
-      repos.keys.each do |repo|
-        # Use shell short circuit to determine if repo already exists
-        @cmds << "zypper lr \'#{repo}\' | grep -sq ^Name || zypper ar \'#{repos[repo]}\' \'#{repo}\'"
+      unless repos.nil? then
+        repos.keys.each do |repo|
+          # Use shell short circuit to determine if repo already exists
+          @cmds << "zypper lr \'#{repo}\' | grep -sq ^Name || zypper ar \'#{repos[repo]}\' \'#{repo}\'"
+        end
       end
     end
 
@@ -26,6 +28,23 @@ module Vagrant
     end
 
     # Runs all the commands in a single shell
+    def add
+      @node.vm.provision 'shell', inline: @cmds.join('; ') 
+    end
+  end
+
+  # Adds SUSEConnect Repos
+  class SUSEConnect
+    def initialize(node, commands)
+      @node = node
+      @cmds = []
+      unless commands.nil? then
+        commands.each do |cmd|
+          @cmds << "#{cmd}"
+        end
+      end
+    end
+
     def add
       @node.vm.provision 'shell', inline: @cmds.join('; ') 
     end

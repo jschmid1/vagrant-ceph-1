@@ -18,7 +18,7 @@ Vagrant::Hosts::check_for_ssh_keys
 
 # Set BOX to one of 'openSUSE-13.2', 'Tumbleweed', 'SLE-12'
 #BOX = 'opensuse/openSUSE-42.2-x86_64'
-BOX = 'SLE12-SP3'
+BOX = 'SLE12-SP3-patch'
 
 # Set INSTALLATION to one of 'ceph-deploy', 'vsm'
 INSTALLATION = 'salt'
@@ -70,6 +70,10 @@ def provisioning(hosts, node, config, name)
         repos.clean
       end
       repos.add
+      #
+      # Add SUSEConnect repos
+      suseconnect = Vagrant::SUSEConnect.new(node, config[BOX][INSTALLATION]['register'])
+      suseconnect.add
 
       # Copy custom files 
       files = Vagrant::Files.new(node, INSTALLATION, name, 
