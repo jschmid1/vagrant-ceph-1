@@ -819,6 +819,28 @@ default:
 #
 # This requires 2.5G RAM and ~7G disk space.  Initial vagrant up is ~13 minutes
 # on a quad core.
+tiny:
+  description: "1 admin, 1mon, 1 data node"
+  nodes:
+    admin:
+      management: 192.168.1.254
+      public:  172.16.21.254
+      cluster: 172.16.22.254
+    mon1:
+      management: 192.168.1.11
+      public:  172.16.11.11
+      cluster: 172.16.22.11
+    data1:
+      management: 192.168.1.21
+      public:  172.16.21.21
+      cluster: 172.16.22.21
+  memory:
+    admin: 2048
+    mon: 2048
+    data1: 2048
+  disks:
+    data1:
+      hds: 2
 small:
   description: "admin, 1 monitor, 3 data nodes"
   nodes:
