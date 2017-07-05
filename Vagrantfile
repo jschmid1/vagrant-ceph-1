@@ -18,14 +18,14 @@ Vagrant::Hosts::check_for_ssh_keys
 
 # Set BOX to one of 'openSUSE-13.2', 'Tumbleweed', 'SLE-12'
 #BOX = 'opensuse/openSUSE-42.2-x86_64'
-BOX = 'SLE12-SP3-patch'
+BOX = 'SLE12-SP3'
 
 # Set INSTALLATION to one of 'ceph-deploy', 'vsm'
 INSTALLATION = 'salt'
 
 # Set CONFIGURATION to one of 'default', 'small', 'iscsi' or 'economical'
-#CONFIGURATION = 'default'
-CONFIGURATION = 'tiny'
+CONFIGURATION = 'default'
+#CONFIGURATION = 'tiny'
 
 raise "Box #{BOX} missing from config.yml" unless config[BOX]
 raise "Installation #{INSTALLATION} missing for box #{BOX} from config.yml" unless config[BOX][INSTALLATION]

@@ -17,3 +17,12 @@ vi /srv/salt/ceph/
 vi /srv/salt/_modules/
 journalctl -u salt-minion
 journalctl -u salt-master
+salt-key -L
+salt-key -A
+salt-run state.orch ceph.stage.0; salt-run state.orch ceph.stage.0; salt-run state.orch ceph.stage.1; salt-run state.orch ceph.stage.2
+salt '*' cmd.run reboot
+salt-run disengage.safety;salt-run state.orch ceph.purge
+salt-run disengage.safety
+
+
+

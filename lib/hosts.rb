@@ -47,9 +47,6 @@ module Vagrant
 
         127.0.0.1       localhost
 
-        # special IPv6 addresses
-        ::1             localhost ipv6-localhost ipv6-loopback
-
         fe00::0         ipv6-localnet
 
         ff00::0         ipv6-mcastprefix
