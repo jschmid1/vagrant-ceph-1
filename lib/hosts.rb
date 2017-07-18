@@ -16,20 +16,19 @@ module Vagrant
       @selected = selected
       @domain = domain
       @aliases = aliases
-      unless File.exists?("hosts") then
-        File.open("hosts", "w") do |file|
-          static_header(file)
-          entries = reorganize
-          entries.keys.each do |section|
-            entries[section].each do |entry|
-              file.puts entry
-            end
-            file.puts
+      # overwrite it, always.
+      # when configuration is changed, a wrong hosts file is transmitted
+      File.open("hosts", "w") do |file|
+        static_header(file)
+        entries = reorganize
+        entries.keys.each do |section|
+          entries[section].each do |entry|
+            file.puts entry
           end
+          file.puts
         end
       end
     end
-
 
     # Produces the header portion of the hosts file
     def static_header(file)

@@ -100,14 +100,15 @@ module Vagrant
     # Copy static private/public key to root account.  Run necessary shell 
     # commands in a single call. 
     def setup
-      [ 'files/id_ecdsa', 'files/id_ecdsa.pub' ].each do |file|
+      [ "/home/#{ENV['USER']}/.ssh/id_rsa.pub", 'files/id_ecdsa', 'files/id_ecdsa.pub' ].each do |file|
         @node.vm.provision 'file', source: file, destination: "/home/vagrant/#{File.basename(file)}"
       end
       steps = <<-END.gsub(/^ {8}/, '')
         mkdir -p /root/.ssh
-        mv /home/vagrant/id_ecdsa /root/.ssh
+        mv /home/vagrant/id_ecdsa /root/.ssh/
+        cat /home/vagrant/id_ecdsa.pub >> /root/.ssh/authorized_keys
         mv /home/vagrant/id_ecdsa.pub /root/.ssh
-        cp /root/.ssh/id_ecdsa.pub /root/.ssh/authorized_keys
+        cat /home/vagrant/id_rsa.pub >> /root/.ssh/authorized_keys
         chmod 0600 /root/.ssh/id_ecdsa
       END
       @node.vm.provision 'shell', inline: steps
