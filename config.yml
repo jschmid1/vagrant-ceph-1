@@ -438,6 +438,54 @@ opensuse/openSUSE-42.2-x86_64:
         - systemctl stop SuSEfirewall2
         - systemctl restart salt-minion
         - systemctl enable salt-minion
+          #
+########################################
+# SLE 12 SP2 SES4 migration
+########################################
+SLE12-SP2-migration:
+  salt:
+    register:
+        - SUSEConnect -r 0000000000000
+        - SUSEConnect -r 0000000000000 -p ses/4/x86_64
+    packages:
+      all:
+        - vim
+        - salt-minion
+      admin:
+        - salt-master
+        - vim-data
+        - ntp
+      client1:
+        - multipath-tools
+      client2:
+        - multipath-tools
+    files:
+      all: false
+      admin: true
+      customized: true
+    commands:
+      admin:
+        - systemctl start ntpd
+        - systemctl enable ntpd
+        - systemctl start salt-master
+        - systemctl enable salt-master
+        - sleep 20
+        - salt-key -y -A  || exit 0
+        - chown -R salt:salt /srv/pillar/ceph /srv/salt/ceph 
+        - chmod 1777 /tmp
+        - zypper -n in deepsea
+        - salt-run state.orch ceph.stage.0
+      all:
+        - systemctl disable SuSEfirewall2
+        - systemctl stop SuSEfirewall2
+        - systemctl restart salt-minion
+        - systemctl enable salt-minion
+        - zypper -n in kernel-default | true
+        - zypper -n rm kernel-default-base | true
+      calmari:
+        - systemctl start salt-master
+        - systemctl enable salt-master
+
           
 ########################################
 # SLE 12 SP3 SES5
@@ -446,7 +494,7 @@ SLE12-SP3-patch:
   salt:
     register:
         - SUSEConnect -r 0000000000000
-        - SUSEConnect -r 0000000000000 -p ses/5/x86_64
+        - SUSEConnect -r 0000000000000 -p ses/4/x86_64
     packages:
       all:
         - vim
@@ -556,6 +604,86 @@ SLE12-SP3:
       calmari:
         - systemctl start salt-master
         - systemctl enable salt-master
+
+
+########################################
+# SLE 12 SP2 SES4 IBS image1
+########################################
+suse/sles12sp2:
+  openattic:
+    repos:
+      'OpenAttic': 'http://download.opensuse.org/repositories/filesystems:/openATTIC/SLE_12_SP2/'
+      'sle-sdk': 'http://download.suse.de/ibs/SUSE/Products/SLE-SDK/12-SP2/x86_64/product/'
+      'sle-sdk update': 'http://download.suse.de/ibs/SUSE/Updates/SLE-SDK/12-SP2/x86_64/update/'
+      'SLE 12 update': 'http://download.suse.de/ibs/SUSE/Products/SLE-SERVER/12-SP2/x86_64/product/'
+      'Storage': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/SES5/standard/'
+    packages:
+      admin:
+        #- monitoring-plugins-http
+        #- monitoring-plugins-swap
+        #- monitoring-plugins-ssh
+        #- monitoring-plugins-ping
+        #- monitoring-plugins-disk
+        - pnp4nagios-0.6.25-8.3
+        - openattic
+        - openattic-gui
+      all:
+        - vim
+        - vim-data
+        - man
+    files:
+      admin: true
+    commands:
+      admin:
+        - ln -s /etc/icinga /etc/nagios3
+        - ln -s /etc/icinga/icinga.cfg /etc/icinga/nagios.cfg
+        - ln -s /usr/sbin/icinga /usr/sbin/nagios
+        - systemctl enable apache2
+        - systemctl start apache2
+        - oaconfig install --allow-broken-hostname
+  salt:
+    repos:
+      'sle-sdk': 'http://download.suse.de/ibs/SUSE/Products/SLE-SDK/12-SP2/x86_64/product/'
+      'sle-sdk update': 'http://download.suse.de/ibs/SUSE/Updates/SLE-SDK/12-SP2/x86_64/update/'
+      'SLE 12 update': 'http://download.suse.de/ibs/SUSE/Products/SLE-SERVER/12-SP2/x86_64/product/'
+      'Storage': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/SES4/images/repo/SUSE-Enterprise-Storage-4-POOL-x86_64-Media1/'
+      'Salt': 'http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/SLE_12_SP2/'
+      'ses4updates': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update:/Products:/SES4:/Update/standard/'
+      'sle12updates': 'http://download.suse.de/ibs/SUSE:/SLE-12-SP2:/Update/standard/'
+    packages:
+      all:
+        - vim
+        - vim-data
+        - python-setuptools
+        - salt-minion
+      admin:
+        - salt-master
+        - ntp
+        - tree
+      client1:
+        - multipath-tools
+      client2:
+        - multipath-tools
+    files:
+      all: false
+      admin: true
+    commands:
+      admin:
+        - systemctl start ntpd
+        - systemctl enable ntpd
+        - systemctl start salt-master
+        - systemctl enable salt-master
+        - sleep 10
+        - salt-key -y -A  || exit 0
+        - chown -R salt:salt /srv/pillar/ceph /srv/salt/ceph 
+        - chmod 1777 /tmp
+      all:
+        - systemctl restart salt-minion
+        - systemctl enable salt-minion
+      calmari:
+        - systemctl start salt-master
+        - systemctl enable salt-master
+
 
 ########################################
 # SLE 12 SP2 SES4
@@ -744,6 +872,51 @@ SLE12-SP1:
 #
 # This requires 5G RAM and ~32G disk space.  Initial vagrant up is ~28 minutes
 # on a quad core.
+dataonmon:
+  description: "admin, 3 monitors, 5 data nodes with journals"
+  nodes:
+    admin:
+      management: 192.168.1.254
+      public:  172.16.1.254
+      cluster: 172.16.2.254
+    data1:
+      management: 192.168.1.21
+      public:  172.16.1.21
+      cluster: 172.16.2.21
+    data2:
+      management: 192.168.1.22
+      public:  172.16.1.22
+      cluster: 172.16.2.22
+    data3:
+      management: 192.168.1.23
+      public:  172.16.1.23
+      cluster: 172.16.2.23
+    data4:
+      management: 192.168.1.24
+      public:  172.16.1.24
+      cluster: 172.16.2.24
+  memory:
+    admin: 2048
+    mon1: 2048
+    mon2: 2048
+    mon3: 2048
+    data1: 1536
+    data2: 1536
+    data3: 1536
+    data4: 1536 
+  disks:
+    data1:
+      hds: 5
+      ssds: 1
+    data2:
+      hds: 5
+      ssds: 1
+    data3:
+      hds: 5
+      ssds: 1
+    data4:
+      hds: 5
+      ssds: 1
 default:
   description: "admin, 3 monitors, 5 data nodes with journals"
   nodes:
@@ -779,27 +952,35 @@ default:
       management: 192.168.1.24
       public:  172.16.1.24
       cluster: 172.16.2.24
+    data5:
+      management: 192.168.1.25
+      public:  172.16.1.25
+      cluster: 172.16.2.25
   memory:
-    admin: 1512
-    mon1: 1248
-    mon2: 1248
-    mon3: 1248
-    data1: 1248
-    data2: 1248
-    data3: 1248
-    data4: 1248 
+    admin: 2048
+    mon1: 2048
+    mon2: 2048
+    mon3: 2048
+    data1: 1536
+    data2: 1536
+    data3: 1536
+    data4: 1536 
+    data5: 1536
   disks:
     data1:
-      hds: 3
+      hds: 5
       ssds: 1
     data2:
-      hds: 3
+      hds: 5
       ssds: 1
     data3:
-      hds: 3
+      hds: 5
       ssds: 1
     data4:
-      hds: 3
+      hds: 5
+      ssds: 1
+    data5:
+      hds: 5
       ssds: 1
 # The small configuration is a typical demo setup of a monitor and three data
 # nodes with two osds each.  This can be ideal for varifying that Vagrant and

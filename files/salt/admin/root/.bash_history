@@ -12,6 +12,7 @@ salt '*' grains.items
 salt-run state.event pretty=True
 zypper in /deepsea*
 vi /srv/pillar/ceph/proposals/
+vi /srv/pillar/ceph/proposals/policy.cfg
 vi /srv/pillar/ceph/stack
 vi /srv/salt/ceph/
 vi /srv/salt/_modules/
