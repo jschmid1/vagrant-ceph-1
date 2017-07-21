@@ -98,10 +98,10 @@ This repository diverged from it's origin in following features:
 
 ## Partly overwrite configurations
 
-files/<b>installation_mode</b>/<b>HOST</b> holds files that will be copied over to the <host>.
+files/<b>installation_mode</b>/<b>HOST</b> holds files that will be copied over to the <b>HOST</b>.
 If you deploy different kinds of Versions of SLES/SES you can create subdirectories that match the following pattern:
 
-"files/<b>installation_mods</b>/<BOX>\_<CONFIGURATION>"
+"files/<b>installation_mode</b>/<b>BOX</b>_<b>CONFIGURATION</b>"
 
 I.e. "SLE12-SP3\_default"
 
