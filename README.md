@@ -96,6 +96,17 @@ This repository diverged from it's origin in following features:
   * include a comprehensive .bash_history on the master
   * More cluster sizes and configurations
 
+## Partly overwrite configurations
+
+files/<b>installation_mode</b>/<host> holds files that will be copied over to the <host>.
+If you deploy different kinds of Versions of SLES/SES you can create subdirectories that match the following pattern:
+
+files/<b>installation_mods</b>/<BOX>_<CONFIGURATION>
+
+I.e. SLE12-SP3_default
+
+This directory can hold a single file that differs from the default tree in files/<b>installation_mode</b>/<host>
+
 
 ## Caveats
 For the sake of completeness and stating the obvious, the private ssh key is only suitable for demonstrations and should never be used in a real environment.
