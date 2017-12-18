@@ -1,4 +1,5 @@
 require 'open3'
+require 'fileutils'
 ##include Archive::Tar
 
 # Namespace for helper routines
@@ -148,24 +149,38 @@ module Vagrant
     # the file on the virtual machine.  Copies both subdirectories of all
     # and host specific trees.
     def copy
+      #puts @node.inspect
+      puts @install_mode
+      puts @host
+      puts @files
+      puts @box
+      puts @configuration
       unless (@files.nil?) then
         [ 'all', @host ].each do |subdir|
           unless (@files[subdir].nil?) then
-            # check if enabled
             if (@files[subdir]) then
               tar_file = tar(subdir)
               vm_tar_file = "/home/vagrant/#{File.basename(tar_file)}"
-              @node.vm.provision 'file', source: tar_file,
-                destination: vm_tar_file
-              untar(vm_tar_file)
-            if (@files['customized']) then
-              dir_name = "#{@box}_#{@configuration}"
-              if (File.directory?("files/#{@install_mode}/#{dir_name}")) then
-                tar_file = tar(dir_name)
+              #@node.vm.provision 'file', source: tar_file,
+              #  destination: vm_tar_file
+              #untar(vm_tar_file)
+            if (@files[subdir] == 'custom') then
+
+              files_dir = 'files'
+              base_dir = 'overwrite'
+              config_dir = @configuration
+              box_dir = @box
+              node_dir = @host
+              dir = "#{files_dir}/#{base_dir}/#{config_dir}/#{box_dir}/#{node_dir}"
+
+              if (File.directory?(dir)) then
+                tar_file = tar("#{@box}_#{@configuration}")
                 vm_tar_file = "/home/vagrant/#{File.basename(tar_file)}"
-                @node.vm.provision 'file', source: tar_file,
-                  destination: vm_tar_file
-                untar(vm_tar_file)
+                #@node.vm.provision 'file', source: tar_file,
+                #  destination: vm_tar_file
+                #untar(vm_tar_file)
+              else
+                puts "#{dir} does not exist. Please create the desired directory stucture in order to upload it to the node"
               end
             end
           end
@@ -180,7 +195,8 @@ module Vagrant
     def tar(subdir)
       filename = "/tmp/#{@install_mode}-#{subdir}.tar"
       File.open(filename, "wb") do |tar|
-        dir = "files/#{@install_mode}/#{subdir}"
+        dir = "files/default/#{@install_mode}/#{subdir}"
+        puts "Checking #{dir}"
         if (File.directory?(dir)) then
           Dir.chdir(dir) do
             cmd = "tar cf #{filename} *"
@@ -191,8 +207,11 @@ module Vagrant
             end
             #Minitar.pack('*', tar)
           end
+        else
+          puts "No dir at: #{dir}"
         end
       end
+      puts "archive in #{filename}"
       filename
     end
 
@@ -232,3 +251,12 @@ module Vagrant
   end
 
 end
+
+#require 'byebug'
+#files = Vagrant::Files.new('libvirt', 'salt', 'admin', {"all"=>false, "admin"=>'custom', "data1"=>'custom'}, 'SLE12-SP3', 'tiny')
+#files.copy()
+#puts "\n\n\n\n"
+#files = Vagrant::Files.new('libvirt', 'salt', 'data1', {"all"=>false, "admin"=>true, "data1"=>'custom'}, 'SLE12-SP3', 'tiny')
+#files.copy()
+#files = Vagrant::Files.new('libvirt', 'salt', 'mon1', {"all"=>false, "admin"=>true, "data1"=>'custom'}, 'SLE12-SP3', 'tiny')
+#files.copy()

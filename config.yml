@@ -224,6 +224,7 @@ SLE12-SP3:
     files:
       all: false
       admin: true
+      data1: custom
     commands:
       admin:
         - systemctl start ntpd
@@ -268,6 +269,8 @@ SLE12-SP2:
         - man
     files:
       admin: true
+      all: false
+      data1: custom
     commands:
       admin:
         - ln -s /etc/icinga /etc/nagios3
